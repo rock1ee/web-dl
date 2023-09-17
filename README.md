@@ -1,6 +1,6 @@
 ## Configure
 
-Login Github and go to  account setting to create a peasonal  access token:
+1. Login Github and go to  account setting to create a peasonal  access token:
 
 Settings -> Developer settings -> Personal access tokens -> Generate new token
 
@@ -11,6 +11,10 @@ repo -> setting -> Secrets -> Action secrets -> New repository secret
 name: ACCESS_TOKEN
 
 value: content of the token
+
+2. repo settings ->actions->general->workflow permissions: Read and write permissions;Allow GitHub Actions to create and approve pull requests.
+
+3. repo settings ->Secrets and variables->actions->New repository secret: DRIVE_ID,REFRESH_TOKEN
 
 ## BT Downloader Compared
 
