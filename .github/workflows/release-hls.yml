@@ -1,0 +1,51 @@
+name: HLS to Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Video URL(HTTP/HTTPS OR Metalink)'
+        required: true
+      video:
+        description: 'Video File Path(Wildcard support)'
+        required: true
+      title:
+        description: 'Release Title'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Setup Aria2/FFmpeg
+        run: |
+          python ./aria2/add_tracker.py
+          wget -q https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-linux-x64 -O /usr/local/bin/ffmpeg
+          chmod +x /usr/local/bin/ffmpeg
+
+      - name: Download video
+        run: | 
+            aria2c --conf-path=./aria2/aria2.conf "${{ github.event.inputs.url }}"
+
+      - name: Process video
+        run: |
+          ffmpeg -hide_banner -i ${{ github.event.inputs.video }} -c copy -sn \
+          -f hls -hls_time 60 -hls_list_size 0 -hls_segment_filename v%3d.ts index.m3u8
+          
+      - name: Upload video
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          title: ${{ github.event.inputs.title }}
+        run: |
+          gh release create ${{ github.run_id }} --title "$title" index.m3u8 *.ts

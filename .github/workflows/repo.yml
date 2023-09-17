@@ -1,0 +1,92 @@
+name: HLS to Repo
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Video URL(HTTP/HTTPS OR Metalink)'
+        required: true
+      path:
+        description: 'Video File Path(Wildcard support)'
+        required: true
+      repo:
+        description: 'Repo Name'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Setup FFmpeg/Python/Aria2
+        run: |
+          wget -q https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-linux-x64 -O /usr/local/bin/ffmpeg
+          chmod +x /usr/local/bin/ffmpeg
+          pip --quiet install bs4 && python ./aria2/add_tracker.py
+
+      - name: Get JAV info
+        run: |
+            python javinfo.py ${{ github.event.inputs.repo }}
+
+      - name: Download video
+        run: |
+            aria2c --conf-path=./aria2/aria2.conf "${{ github.event.inputs.url }}"
+
+      - name: Process video
+        run: |
+          #bash video_preview.sh ${{ github.event.inputs.path }} 480 4 4 preview.jpg
+          #ffmpeg -hide_banner -i ${{ github.event.inputs.path }} \
+          #        -vf  "fps=1/60,scale=480:-1,tile=4x30" thumb.jpg
+          ffmpeg -hide_banner -i ${{ github.event.inputs.path }} \
+                 -c copy -sn -f hls -bsf:v h264_mp4toannexb -hls_time 1 \
+                 -hls_list_size 0 -hls_segment_filename %4d.ts index.m3u8
+     
+      - name: Push to Github
+        env:
+          OWNER: ${{ github.actor }}
+          REPO: ${{ github.event.inputs.repo }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          gh repo create ${REPO} --public
+          git config --global user.name "${OWNER}"
+          git config --global user.email "${OWNER}@users.noreply.github.com"
+          ## move video into dir
+          mkdir -p dir/res/
+          mv *.m3u8 *.ts dir/res/
+          mkdir -p dir/img/
+          ## move pictures into dir
+          imgs=(*.jpg)
+          if [ -f ${imgs[0]} ];then
+            mv *.jpg dir/img/
+          fi
+          ## move index.html into dir
+          mv index.html dir/
+          ## get into dir and upload to github
+          cd dir
+          git init
+          git add img res/*.m3u8 index.html
+          git commit -m "Add img and index"
+          git remote add origin https://${OWNER}:${GITHUB_TOKEN}@github.com/${OWNER}/${REPO}.git
+          git push -u origin master
+          for i in {0..9};do
+            for j in {0..9};do
+              files=(res/$i$j??.ts)
+              if [ -f ${files[0]} ];then
+                git add "${files[@]}"
+                git commit -m "$i$j st commit"
+                git push
+              else
+                exit 0
+              fi
+            done
+          done

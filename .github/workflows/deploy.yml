@@ -1,0 +1,40 @@
+name: Deploy Website
+
+on: [workflow_dispatch, repository_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Build site
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          pip --quiet install bs4
+          cd home
+          mkdir -p build
+          mkdir -p page
+          python build.py
+          mv ./*.html ./css ./page ./build
+
+      - name: Deploy site
+        env:
+          TOKEN: ${{ github.token }}
+          ACTOR: ${{ github.actor }}
+          REPO: ${{ github.repository }}
+        run: |
+          cd ./home/build
+          git config --global init.defaultBranch main
+          git init
+          git config user.email "${ACTOR}@users.noreply.github.com"
+          git config user.name "${ACTOR}"
+          git add .
+          git commit -m "Deploy ${GITHUB_SHA}"
+          git push -f "https://${ACTOR}:${TOKEN}@github.com/${REPO}.git" main:gh-pages

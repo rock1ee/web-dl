@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{name}</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js"></script>
+</head>
+
+<body>
+    <div id="movie" align="center">
+        <video id="video"  width=85% height="725" controls poster="https://fastv.pages.dev/video/{name}/online/img/pic0.jpg"></video>
+        <script>
+        var video = document.getElementById('video');
+        var videoSrc = 'https://fastv.pages.dev/video/{name}/online/res/index.m3u8';
+        if (Hls.isSupported()) {
+            var hls = new Hls();
+            hls.loadSource(videoSrc);
+            hls.attachMedia(video);
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = videoSrc;
+        }
+        </script>
+    </div>
+</body>
+
+</html>
