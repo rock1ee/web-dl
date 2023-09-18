@@ -3,29 +3,34 @@ import requests
 from bs4 import BeautifulSoup
 
 # list github repo name
-# token: github repo access token for authentication
-# page: page number(30 items per page)
-def list_repos(token, page=1):
-    url = 'https://api.github.com/user/repos'
-    header = {'Authorization': f'token {token}'}
-    params = {'per_page': 30, 'page': page, 'sort': 'updated'}
-    r = requests.get(url, headers=header, params=params)
-    repos = r.json()
-    repo_name_list = []
-    for repo in repos:
-        repo_name_list.append(repo['name'])
-    return repo_name_list
+# page: page number
+# per_page: how many items per page(max=100)
+def get_list(page, per_page=28):
+    video_list = []
+    url = 'https://api.github.com/repos/rock1ee/web-dl/releases'
+    params = {'per_page': per_page, 'page': page}
+    with requests.get(url, params=params) as r:
+        releases = r.json()
+    for release in releases:
+        video_list.append({'name': release['name'], 'tag_name': release['tag_name']})
+    return video_list
+
+def get_total_page():
+    total_page = 1
+    while get_list(total_page):
+        total_page += 1
+    return total_page - 1
 
 # generate detail page for each video
-# repo: github repository name
-def gen_detail_page(repo):
+# name: video name(video id)
+def gen_detail_page(name, video_src, img_src):
     hls = open("./template/hls.html", 'r')
-    page = open(f'./page/{repo}.html', 'a')
-    content = hls.read().replace('{name}', repo)
+    page = open(f'./page/{name}.html', 'a')
+    content = hls.read().replace('{video_src}', video_src).replace('{img_src}', img_src)
     page.write(content)
     hls.close()
     page.close()
-    print(repo, 'page generated!')
+    print(name, 'page generated!')
 
 # generate card tag for each video in index page
 # href: url that link to video detail page
@@ -46,33 +51,29 @@ def gen_card_tag(href, img_src, title):
     return original_tag
 
 # generate index page for all video
-# owner: github username/account
+# repo: github owner/repo,such as `rock1ee/web-dl`
 # index_num: index page number
 # video_id_list: a list of video_id(repo name)
 # total_page: number of index page(for figuring out number of pagination)
-def gen_index_page(owner, index_num, video_id_list, total_page):
+def gen_index_page(repo, index_num, video_list, total_page):
+    proxy_url = 'https://web-dl.pages.dev'
+    pre_url = f'https://github.com/{repo}/releases/download'
     html_name = f"index{index_num}.html"
-    exclude_repos = {'web-dl', 'JavSub'}
     html = open(html_name, "wb")
     homepage = open("./template/home.html", "r")
     soup = BeautifulSoup(homepage.read(), "html.parser")
     # add iterm to card-list
     card_list = soup.body.ul
-    proxy_url = 'https://fastv.pages.dev'
-    for video_id in video_id_list:
-        if video_id in exclude_repos:
-            continue
-        if requests.head(f"https://raw.githubusercontent.com/{owner}/{video_id}/master/img/pic0.jpg").status_code == 200:
-            img = f"{proxy_url}/video/{video_id}/online/img/pic0.jpg"
-        else:
-            img = f"{proxy_url}/video/{video_id}/online/pic0.jpg"
-        new_item = gen_card_tag(f"./page/{video_id}.html", img, video_id)
+    for video in video_list:
+        img_src = f"{proxy_url}/{pre_url}/{video['tag_name']}/release.dgst"
+        video_src = f"{proxy_url}/{pre_url}/{video['tag_name']}/x86_64-unknown-linux-musl.sha256"
+        new_item = gen_card_tag(f"./page/{video['name']}.html", img_src, video['name'])
         card_list.append(new_item)
-        print(video_id, "had added to index!")
-        gen_detail_page(video_id)
+        print(video['name'], "had added to index!")
+        gen_detail_page(video['name'], video_src, img_src)
     # pagination
     page_list = soup.find("div",{"class": "pagination"}).ul
-    # prev
+    # prev_page
     page_tag = soup.new_tag("li")
     page_num = index_num - 1 if index_num - 1 > 0 else index_num
     page_name = f"index{page_num}.html"
@@ -89,7 +90,7 @@ def gen_index_page(owner, index_num, video_id_list, total_page):
         href_tag = soup.new_tag("a", attrs={"href": page_name})
         page_tag.append(href_tag)
         page_list.append(page_tag)
-    # next
+    # next_page
     page_tag = soup.new_tag("li")
     page_num = index_num + 1 if index_num + 1 <= total_page else index_num
     page_name = f"index{page_num}.html"
@@ -107,15 +108,9 @@ def gen_index_page(owner, index_num, video_id_list, total_page):
     print(html_name, "generated!")
 
 
-def get_public_repo_num(owner)->int:
-    url = f"https://api.github.com/users/{owner}"
-    return int(requests.get(url).json()["public_repos"])
-
-
 if __name__ == '__main__':
-    token = os.getenv('GH_TOKEN')
-    owner = os.getenv('GITHUB_REPOSITORY_OWNER')
-    total_page = int(get_public_repo_num(owner)/30) + 1
+    repo = os.getenv('GITHUB_REPOSITORY')
+    total_page = get_total_page()
     for i in range(1, total_page + 1):
-        info = list_repos(token, i)
-        gen_index_page(owner, i, info, total_page)
+        video_list = get_list(i)
+        gen_index_page(repo, i, video_list, total_page)

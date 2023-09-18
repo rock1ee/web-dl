@@ -14,8 +14,6 @@ jobs:
           ref: main
 
       - name: Build site
-        env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           pip --quiet install bs4
           cd home
