@@ -26,7 +26,7 @@ def get_total_page():
 def gen_detail_page(name, video_src, img_src):
     hls = open("./template/hls.html", 'r')
     page = open(f'./page/{name}.html', 'a')
-    content = hls.read().replace('{video_src}', video_src).replace('{img_src}', img_src)
+    content = hls.read().replace('{video_src}', video_src).replace('{img_src}', img_src).replace('{name}', name)
     page.write(content)
     hls.close()
     page.close()
@@ -56,7 +56,7 @@ def gen_card_tag(href, img_src, title):
 # video_id_list: a list of video_id(repo name)
 # total_page: number of index page(for figuring out number of pagination)
 def gen_index_page(repo, index_num, video_list, total_page):
-    proxy_url = 'https://web-dl.pages.dev'
+    proxy_url = 'https://ghproxy.com/'
     pre_url = f'https://github.com/{repo}/releases/download'
     html_name = f"index{index_num}.html"
     html = open(html_name, "wb")
@@ -65,8 +65,8 @@ def gen_index_page(repo, index_num, video_list, total_page):
     # add iterm to card-list
     card_list = soup.body.ul
     for video in video_list:
-        img_src = f"{proxy_url}/{pre_url}/{video['tag_name']}/release.dgst"
-        video_src = f"{proxy_url}/{pre_url}/{video['tag_name']}/x86_64-unknown-linux-musl.sha256"
+        img_src = f"{proxy_url}/{pre_url}/{video['tag_name']}/x86_64-unknown-linux-musl.tar.gz"
+        video_src = f"{proxy_url}/{pre_url}/{video['tag_name']}/x86_64-unknown-linux-musl.zip"
         new_item = gen_card_tag(f"./page/{video['name']}.html", img_src, video['name'])
         card_list.append(new_item)
         print(video['name'], "had added to index!")

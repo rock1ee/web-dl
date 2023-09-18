@@ -41,7 +41,7 @@ jobs:
       - name: Process video
         run: |
           ffmpeg -hide_banner -i ${{ github.event.inputs.video }} -c copy -sn \
-          -f hls -hls_time 60 -hls_list_size 0 -hls_segment_filename x86_64-unknown-linux-musl-%3d.tar.xz x86_64-unknown-linux-musl.tar.xz.sha256
+          -f hls -hls_time 60 -hls_list_size 0 -hls_segment_filename x86_64-unknown-linux-musl-%3d.tar.xz x86_64-unknown-linux-musl.zip
           
       - name: Upload video
         env:
