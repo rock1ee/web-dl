@@ -2,23 +2,23 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
-# list github repo name
+# list github releases tag
 # repo: github owner/repo,such as `rock1ee/web-dl`
 # page: page number
 # per_page: how many items per page(max=100)
-def get_list(repo, page, per_page=28):
-    video_list = []
+def get_tag_list(repo, page, per_page=28):
+    tag_list = []
     url = f'https://api.github.com/repos/{repo}/releases'
     params = {'per_page': per_page, 'page': page}
     with requests.get(url, params=params) as r:
         releases = r.json()
     for release in releases:
-        video_list.append({'name': release['name'], 'tag_name': release['tag_name']})
-    return video_list
+        tag_list.append(release['tag_name'])
+    return tag_list
 
 def get_total_page():
     total_page = 1
-    while get_list(total_page):
+    while get_tag_list(total_page):
         total_page += 1
     return total_page - 1
 
@@ -56,7 +56,7 @@ def gen_card_tag(href, img_src, title):
 # index_num: index page number
 # video_id_list: a list of video_id(repo name)
 # total_page: number of index page(for figuring out number of pagination)
-def gen_index_page(repo, index_num, video_list, total_page):
+def gen_index_page(repo, index_num, tag_list, total_page):
     proxy_url = 'https://ghproxy.com/'
     pre_url = f'https://github.com/{repo}/releases/download'
     html_name = f"index{index_num}.html"
@@ -65,13 +65,13 @@ def gen_index_page(repo, index_num, video_list, total_page):
     soup = BeautifulSoup(homepage.read(), "html.parser")
     # add iterm to card-list
     card_list = soup.body.ul
-    for video in video_list:
-        img_src = f"{proxy_url}/{pre_url}/{video['tag_name']}/x86_64-unknown-linux-musl.tar.gz"
-        video_src = f"{proxy_url}/{pre_url}/{video['tag_name']}/x86_64-unknown-linux-musl.zip"
-        new_item = gen_card_tag(f"./page/{video['name']}.html", img_src, video['name'])
+    for tag in tag_list:
+        img_src = f"{proxy_url}/{pre_url}/{tag}/x86_64-unknown-linux-musl.tar.gz"
+        video_src = f"{proxy_url}/{pre_url}/{tag}/x86_64-unknown-linux-musl.zip"
+        new_item = gen_card_tag(f"./page/{tag}.html", img_src, tag)
         card_list.append(new_item)
-        print(video['name'], "had added to index!")
-        gen_detail_page(video['name'], video_src, img_src)
+        print(tag, "had added to index!")
+        gen_detail_page(tag, video_src, img_src)
     # pagination
     page_list = soup.find("div",{"class": "pagination"}).ul
     # prev_page
@@ -113,5 +113,5 @@ if __name__ == '__main__':
     repo = os.getenv('GITHUB_REPOSITORY')
     total_page = get_total_page()
     for i in range(1, total_page + 1):
-        video_list = get_list(repo, i)
-        gen_index_page(repo, i, video_list, total_page)
+        tag_list = get_tag_list(repo, i)
+        gen_index_page(repo, i, tag_list, total_page)
