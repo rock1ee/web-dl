@@ -28,7 +28,7 @@ jobs:
           curl -sL https://raw.githubusercontent.com/aoaostar/alidrive-uploader/v2/install.sh | bash
           mv alidrive_uploader_linux_amd64/alidrive /usr/local/bin/alidrive && chmod +x /usr/local/bin/alidrive
 
-      - name: Download Video
+      - name: Download File
         run: |
           aria2c --conf-path=./aria2/aria2.conf -d Origin "${{ github.event.inputs.url }}"
 
