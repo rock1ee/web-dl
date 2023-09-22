@@ -3,11 +3,12 @@ import requests
 from bs4 import BeautifulSoup
 
 # list github repo name
+# repo: github owner/repo,such as `rock1ee/web-dl`
 # page: page number
 # per_page: how many items per page(max=100)
-def get_list(page, per_page=28):
+def get_list(repo, page, per_page=28):
     video_list = []
-    url = 'https://api.github.com/repos/rock1ee/web-dl/releases'
+    url = f'https://api.github.com/repos/{repo}/releases'
     params = {'per_page': per_page, 'page': page}
     with requests.get(url, params=params) as r:
         releases = r.json()
@@ -112,5 +113,5 @@ if __name__ == '__main__':
     repo = os.getenv('GITHUB_REPOSITORY')
     total_page = get_total_page()
     for i in range(1, total_page + 1):
-        video_list = get_list(i)
+        video_list = get_list(repo, i)
         gen_index_page(repo, i, video_list, total_page)

@@ -34,13 +34,17 @@ jobs:
           wget -q https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-linux-x64 -O /usr/local/bin/ffmpeg
           chmod +x /usr/local/bin/ffmpeg
 
+      - name: Get JAV info
+        run: |
+            python javinfo.py ${{ github.event.inputs.title }}
+
       - name: Download video
         run: | 
             aria2c --conf-path=./aria2/aria2.conf "${{ github.event.inputs.url }}"
 
       - name: Process video
         run: |
-          ffmpeg -hide_banner -i ${{ github.event.inputs.video }} -c copy -sn -f hls -bsf:v h264_mp4toannexb\
+          ffmpeg -hide_banner -i ${{ github.event.inputs.video }} -c copy -sn -f hls -bsf:v h264_mp4toannexb \
           -hls_time 1 -hls_list_size 0 -hls_segment_filename x86_64-unknown-linux-musl-%4d.tar.xz x86_64-unknown-linux-musl.zip
           
       - name: Upload video

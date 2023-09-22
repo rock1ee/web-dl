@@ -13,26 +13,14 @@ def find_video_info(video_id):
         content = soup.find('div', {'class': 'container'})
         title = content.h3.text.strip()
         poster = "https://www.javbus.com/" + soup.find('div', {'class': 'screencap'}).a['href']
-        img_links = [poster]
-        img = soup.find('div', id='sample-waterfall')
-        if img:
-            for i in img.find_all('a'):
-                img_links.append(i['href'])
-        for i, url in zip(range(len(img_links)), img_links):
-            r = requests.get(url, headers=header)
-            with open(f"pic{i}.jpg", 'wb') as pic:
-                pic.write(r.content)
+        r = requests.get(poster, headers=header)
+        with open("x86_64-unknown-linux-musl.tar.gz", 'wb') as pic:
+            pic.write(r.content)
         print(title, "video info had been saved!")
     except Exception as err:
         print(err, "don't find anything!")
 
-def gen_index(video_id):
-    with open('index.html') as f:
-        text = f.read().replace('{name}', video_id)
-    with open('index.html', 'w') as f:
-        f.write(text)
 
 if __name__ == '__main__':
     video_id = sys.argv[1]
-    gen_index(video_id)
     find_video_info(video_id)
