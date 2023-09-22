@@ -45,25 +45,14 @@ jobs:
       - name: Process video
         run: |
           ffmpeg -hide_banner -i ${{ github.event.inputs.video }} -c copy -sn -f hls -bsf:v h264_mp4toannexb \
-          -hls_time 1 -hls_list_size 0 -hls_segment_filename x86_64-unknown-linux-musl-%4d.tar.xz x86_64-unknown-linux-musl.zip
+          -hls_time 60 -hls_list_size 0 -hls_segment_filename x86_64-unknown-linux-musl-%4d.tar.xz x86_64-unknown-linux-musl.zip
           
       - name: Upload video
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           title: ${{ github.event.inputs.title }}
         run: |
-          gh release create ${{ github.run_id }} --title "$title" x86_64-unknown-linux-musl.*
-          for i in {0..9};do
-            for j in {0..9};do
-              files=(x86_64-unknown-linux-musl-$i$j??.tar.xz)
-              if [ -f ${files[0]} ];then
-                gh release upload ${{ github.run_id }} "${files[@]}"
-                sleep 60
-              else
-                exit 0
-              fi
-            done
-          done
+          gh release create ${{ github.run_id }} --title "$title" x86_64-unknown-linux-musl*
       
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
