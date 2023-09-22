@@ -16,9 +16,10 @@ def get_tag_list(repo, page, per_page=28):
         tag_list.append(release['tag_name'])
     return tag_list
 
-def get_total_page():
+# repo: github owner/repo,such as `rock1ee/web-dl`
+def get_total_page(repo):
     total_page = 1
-    while get_tag_list(total_page):
+    while get_tag_list(repo, total_page):
         total_page += 1
     return total_page - 1
 
@@ -111,7 +112,7 @@ def gen_index_page(repo, index_num, tag_list, total_page):
 
 if __name__ == '__main__':
     repo = os.getenv('GITHUB_REPOSITORY')
-    total_page = get_total_page()
+    total_page = get_total_page(repo)
     for i in range(1, total_page + 1):
         tag_list = get_tag_list(repo, i)
         gen_index_page(repo, i, tag_list, total_page)
