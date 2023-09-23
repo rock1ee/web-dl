@@ -52,7 +52,7 @@ jobs:
 
       - name: Upload video
         run: |
-            ./biliup upload --tid=${{ github.event.inputs.tid }} --tag="${{ github.event.inputs.tag }}" --title="${{ github.event.inputs.title }}" ${{ github.event.inputs.path }}
+            ./biliup upload --line=kodo --tid=${{ github.event.inputs.tid }} --tag="${{ github.event.inputs.tag }}" --title="${{ github.event.inputs.title }}" ${{ github.event.inputs.path }}
       
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
