@@ -1,0 +1,63 @@
+name: Upload to Bilibili
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Video URL(HTTP/HTTPS OR Metalink)'
+        required: true
+      path:
+        description: 'Video File Path(Wildcard support)'
+        required: true
+      tid:
+        description: 'Video Catalog(https://biliup.github.io/tid-ref.html)'
+        required: true
+      title:
+        description: 'Video Title(CN/EN Best)'
+        required: true
+      tag:
+        description: 'Video Tag(sperate whith ,)'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          #remove-dotnet: 'true'
+          #remove-android: 'true'
+          #remove-haskell: 'true'
+
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Setup Aria2/Biliup
+        env:
+            BILI_COOKIES: ${{secrets.BILI_COOKIES}}
+        run: |
+          python ./aria2/add_tracker.py
+          echo $BILI_COOKIES > cookies.json
+          url=$(curl -s https://api.github.com/repos/biliup/biliup-rs/releases/latest | grep browser_download_url | grep x86_64-linux.tar | cut -d'"' -f4)
+          wget $url -qO biliup.tar.xz && tar xf biliup.tar.xz && mv biliup*/biliup . && chmod +x ./biliup
+
+      - name: Download video
+        run: |
+            aria2c --conf-path=./aria2/aria2.conf "${{ github.event.inputs.url }}"
+
+      - name: Upload video
+        run: |
+            ./biliup upload --tid=${{ github.event.inputs.tid }} --tag="${{ github.event.inputs.tag }}" --title="${{ github.event.inputs.title }}" ${{ github.event.inputs.path }}
+      
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 0
