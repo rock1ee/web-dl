@@ -1,4 +1,4 @@
-name: Upload to Alidrive(Audio)
+name: Upload to Alidrive(Translate)
 
 on:
   workflow_dispatch:
@@ -24,13 +24,13 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Setup Aria2/Uploader/FFMPEG
+      - name: Setup Aria2/Uploader/Buzz
         run: |
           python ./aria2/add_tracker.py
           curl -sL https://raw.githubusercontent.com/aoaostar/alidrive-uploader/v2/install.sh | bash
           mv alidrive_uploader_linux_amd64/alidrive /usr/local/bin/alidrive && chmod +x /usr/local/bin/alidrive
-          wget -q https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-linux-x64 -O /usr/local/bin/ffmpeg
-          chmod +x /usr/local/bin/ffmpeg
+          sudo apt install libportaudio2
+          sudo snap install buzz
 
 
       - name: Download File
@@ -39,7 +39,7 @@ jobs:
 
       - name: Process video
         run: |
-          ffmpeg -hide_banner -i ${{ github.event.inputs.video }} -acodec copy -vn audio.m4a
+          buzz add --task translate --language zh --srt ${{ github.event.inputs.video }}
 
       - name: Upload to Alidrive
         env:
@@ -47,7 +47,7 @@ jobs:
           refresh_token: ${{ secrets.REFRESH_TOKEN }}
         run: |
           sed -i "s/did/$drive_id/;s/rtoken/$refresh_token/" alidrive.yaml
-          alidrive -c alidrive.yaml audio.m4a Remote
+          alidrive -c alidrive.yaml *.srt Remote
       
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
