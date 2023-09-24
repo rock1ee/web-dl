@@ -1,4 +1,4 @@
-name: HLS to Release
+name: Upload to Release(HLS)
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: HLS to Repo
+name: Upload to Repo(HLS)
 
 on:
   workflow_dispatch:

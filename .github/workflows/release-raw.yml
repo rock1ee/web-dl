@@ -1,4 +1,4 @@
-name: Raw to Release
+name: Upload to Release(Raw)
 
 on:
   workflow_dispatch:
