@@ -1,15 +1,18 @@
 #!/usr/bin/python3
 import sys
 import requests
+from urllib import parse
 from bs4 import BeautifulSoup
 
-def find_video_info(video_id):
+# video_id SSIS-835
+def javbus_info(video_id):
     video_id = video_id.replace('-C','')
     try:
         header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0'}
         r = requests.get(f"https://www.javbus.com/{video_id}", headers=header)
         print(f"https://www.javbus.com/{video_id}")
         soup = BeautifulSoup(r.text, "html.parser")
+        print(soup.prettify())
         content = soup.find('div', {'class': 'container'})
         title = content.h3.text.strip()
         poster = "https://www.javbus.com/" + soup.find('div', {'class': 'screencap'}).a['href']
@@ -20,7 +23,29 @@ def find_video_info(video_id):
     except Exception as err:
         print(err, "don't find anything!")
 
+#video_id SSIS835
+def dmm_info(video_id):
+    video_id = video_id.replace('-C','').replace('-','')
+    try:
+        header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0'}
+        url = f"https://www.dmm.co.jp/mono/dvd/-/detail/=/cid={video_id}/"
+        age_check = f"https://www.dmm.co.jp/age_check/=/declared=yes/?rurl={parse.quote(url)}"
+        s = requests.session()
+        s.get(age_check, headers=header)
+        r = s.get(url, headers=header)
+        soup = BeautifulSoup(r.text, "html.parser")
+        poster = soup.find('a', {'name': 'package-image'})['href']
+        r = requests.get(poster, headers=header)
+        with open("x86_64-unknown-linux-musl.tar.gz", 'wb') as pic:
+            pic.write(r.content)
+        print(poster, " had been saved!")
+    except Exception as err:
+        print(err, "don't find anything!")
+
 
 if __name__ == '__main__':
     video_id = sys.argv[1]
-    find_video_info(video_id)
+    try:
+        javbus_info(video_id)
+    except:
+        dmm_info(video_id)
