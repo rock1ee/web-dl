@@ -28,11 +28,13 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Setup Aria2/FFmpeg
+      - name: Setup Aria2/FFmpeg/Uploader
         run: |
           pip --quiet install bs4 && python ./aria2/add_tracker.py
           wget -q https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-linux-x64 -O /usr/local/bin/ffmpeg
           chmod +x /usr/local/bin/ffmpeg
+          curl -sL https://raw.githubusercontent.com/aoaostar/alidrive-uploader/v2/install.sh | bash
+          mv alidrive_uploader_linux_amd64/alidrive /usr/local/bin/alidrive && chmod +x /usr/local/bin/alidrive
 
       - name: Get JAV info
         run: |
