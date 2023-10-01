@@ -33,7 +33,7 @@ jobs:
 
       - name: Download Video
         run: |
-          aria2c --conf-path=./aria2/aria2.conf -d Modify "${{ github.event.inputs.url }}"
+          aria2c --conf-path=./aria2/aria2.conf -d Mod "${{ github.event.inputs.url }}"
 
       - name: Upload to Alidrive
         env:
@@ -41,11 +41,11 @@ jobs:
           refresh_token: ${{ secrets.REFRESH_TOKEN }}
         run: |
           sed -i "s/did/$drive_id/;s/rtoken/$refresh_token/" alidrive.yaml
-          videos=("./Modify/${{ github.event.inputs.path }}")
+          videos=("./Mod/${{ github.event.inputs.path }}")
           for video in $videos;do
             echo -n $RANDOM >> "$video"
           done
-          alidrive -c alidrive.yaml Modify Remote
+          alidrive -c alidrive.yaml Mod Remote
 
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
