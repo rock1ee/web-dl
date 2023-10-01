@@ -21,7 +21,7 @@ def javbus_info(video_id):
 #video_id SSIS835
 def dmm_info(video_id):
     video_id = video_id.replace('-C','').replace('-','')
-    header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0'}
+    header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0', 'X-Forwarded-For': '104.28.243.105'}
     url = f"https://www.dmm.co.jp/mono/dvd/-/detail/=/cid={video_id}/"
     age_check = f"https://www.dmm.co.jp/age_check/=/declared=yes/?rurl={parse.quote(url)}"
     s = requests.session()
