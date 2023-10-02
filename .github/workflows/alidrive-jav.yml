@@ -56,7 +56,8 @@ jobs:
           refresh_token: ${{ secrets.REFRESH_TOKEN }}
         run: |
           sed -i "s/did/$drive_id/;s/rtoken/$refresh_token/" alidrive.yaml
-          alidrive -c alidrive.yaml ${{ github.event.inputs.vid }}.* Remote/JAV
+          alidrive -c alidrive.yaml ${{ github.event.inputs.vid }}.jpg Remote/JAV
+          alidrive -c alidrive.yaml ${{ github.event.inputs.vid }}.mp4 Remote/JAV
       
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
