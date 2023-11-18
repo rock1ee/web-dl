@@ -33,7 +33,8 @@ jobs:
           pip --quiet install bs4 && python ./aria2/add_tracker.py
           wget -q https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-linux-x64 -O /usr/local/bin/ffmpeg
           chmod +x /usr/local/bin/ffmpeg
-          curl -sL https://raw.githubusercontent.com/aoaostar/alidrive-uploader/v2/install.sh | bash
+          url=$(curl -fsSL https://api.github.com/repos/aoaostar/alidrive-uploader/releases/latest | grep -Eo 'https.*?linux_amd64.tar.gz')
+          curl -L "$url" | tar -xz
           mv alidrive_uploader_linux_amd64/alidrive /usr/local/bin/alidrive && chmod +x /usr/local/bin/alidrive
 
       - name: Get JAV info
