@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PRED-520</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js"></script>
+</head>
+
+<body>
+    <div id="movie" align="center">
+        <video id="video"  width=85% height="725" controls poster="https://ghproxy.com/https://github.com/rock1ee/web-dl/releases/download/PRED-520/x86_64-unknown-linux-musl.tar.gz"></video>
+        <script>
+        var video = document.getElementById('video');
+        var videoSrc = 'https://ghproxy.com/https://github.com/rock1ee/web-dl/releases/download/PRED-520/x86_64-unknown-linux-musl.zip';
+        if (Hls.isSupported()) {
+            var hls = new Hls();
+            hls.loadSource(videoSrc);
+            hls.attachMedia(video);
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = videoSrc;
+        }
+        </script>
+    </div>
+</body>
+
+</html>
