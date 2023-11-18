@@ -58,7 +58,7 @@ def gen_card_tag(href, img_src, title):
 # video_id_list: a list of video_id(repo name)
 # total_page: number of index page(for figuring out number of pagination)
 def gen_index_page(repo, index_num, tag_list, total_page):
-    proxy_url = 'https://ghproxy.com/'
+    proxy_url = 'https://ghproxy.com'
     pre_url = f'https://github.com/{repo}/releases/download'
     html_name = f"index{index_num}.html"
     html = open(html_name, "wb")
