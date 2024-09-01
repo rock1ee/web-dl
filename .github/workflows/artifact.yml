@@ -6,9 +6,6 @@ on:
       url:
         description: 'URL(HTTP/HTTPS OR Metalink)'
         required: true
-      path:
-        description: 'File Path(Wildcard support)'
-        required: true
 
 jobs:
   build:
@@ -28,12 +25,12 @@ jobs:
       - name: Download File
         run: |
             python ./aria2/add_tracker.py
-            aria2c --conf-path=./aria2/aria2.conf "${{ github.event.inputs.url }}"
+            aria2c --conf-path=./aria2/aria2.conf -d DownloadDir "${{ github.event.inputs.url }}"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          path: ${{ github.event.inputs.path }}
+          path: DownloadDir
 
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
