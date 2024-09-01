@@ -1,13 +1,10 @@
-name: Upload to Release(Raw - Single File Max size 2G)
+name: Upload to Release(ZIP)
 
 on:
   workflow_dispatch:
     inputs:
       url:
-        description: 'Video URL(HTTP/HTTPS OR Metalink)'
-        required: true
-      path:
-        description: 'Video File Path(Wildcard support)'
+        description: 'URL(HTTP/HTTPS OR Metalink)'
         required: true
       title:
         description: 'Release Title'
@@ -31,16 +28,20 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Download video
+      - name: Download
         run: |
-            python ./aria2/add_tracker.py
-            aria2c --conf-path=./aria2/aria2.conf "${{ github.event.inputs.url }}"
+          python ./aria2/add_tracker.py
+          aria2c --conf-path=./aria2/aria2.conf -d DowloadDir "${{ github.event.inputs.url }}"
 
-      - name: Upload video
+      - name: Zip
+        run: |
+          zip -s 2g -r x86_64-unknown-linux-musl.zip DowloadDir
+
+      - name: Upload
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
-          gh release create ${{ github.run_id }} --title "${{ github.event.inputs.title }}" ${{ github.event.inputs.path }}
+          gh release create ${{ github.run_id }} --title "${{ github.event.inputs.title }}" 86_64-unknown-linux-musl.z*
       
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
