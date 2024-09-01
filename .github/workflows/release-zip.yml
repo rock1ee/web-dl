@@ -6,8 +6,8 @@ on:
       url:
         description: 'URL(HTTP/HTTPS OR Metalink)'
         required: true
-      title:
-        description: 'Release Title'
+      tag:
+        description: 'Release Tag'
         required: true
 
 jobs:
@@ -35,13 +35,13 @@ jobs:
 
       - name: Zip
         run: |
-          zip -s 2g -r x86_64-unknown-linux-musl.zip DowloadDir
+          zip -s 2g -rm x86_64-unknown-linux-musl.zip DowloadDir
 
       - name: Upload
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ github.run_id }} --title "${{ github.event.inputs.title }}" 86_64-unknown-linux-musl.z*
+          gh release create ${{ github.event.inputs.tag }} --title v$(date "+%Y%m%d%H%M%S") x86_64-unknown-linux-musl*
       
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2

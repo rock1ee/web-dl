@@ -1,4 +1,4 @@
-name: Upload to Release(Raw - Single File Max size 2G)
+name: Upload to Release(Raw-2G limit)
 
 on:
   workflow_dispatch:
