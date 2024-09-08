@@ -37,7 +37,7 @@ jobs:
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
-          retain_days: 0
+          retain_days: 3
           keep_minimum_runs: 0
           delete_workflow_pattern: Upload to Artifact
           delete_run_by_conclusion_pattern: cancelled, failure
