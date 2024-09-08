@@ -40,4 +40,4 @@ jobs:
           retain_days: 0
           keep_minimum_runs: 0
           delete_workflow_pattern: Upload to Artifact
-          delete_run_by_conclusion_pattern: Unsuccessful
+          delete_run_by_conclusion_pattern: cancelled, failure
