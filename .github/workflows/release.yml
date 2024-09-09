@@ -1,5 +1,4 @@
-name: Upload to Release(Raw-2G limit)
-
+name: Upload to Release
 on:
   workflow_dispatch:
     inputs:

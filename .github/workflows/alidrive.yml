@@ -1,4 +1,4 @@
-name: Upload to Alidrive(Raw)
+name: Upload to Alidrive
 
 on:
   workflow_dispatch:
