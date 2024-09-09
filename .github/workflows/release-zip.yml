@@ -35,7 +35,7 @@ jobs:
 
       - name: Zip
         run: |
-          zip -s 2000m -rm x86_64-unknown-linux-musl.zip DowloadDir
+          zip -0 -s 2000m -rm x86_64-unknown-linux-musl.zip DowloadDir
 
       - name: Upload
         env:
