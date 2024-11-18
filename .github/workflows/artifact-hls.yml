@@ -27,9 +27,8 @@ jobs:
 
       - name: Download File
         run: |
-            wget -q https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-linux-x64 -O /usr/local/bin/ffmpeg
-            chmod +x /usr/local/bin/ffmpeg
-            ffmpeg -i "${{ github.event.inputs.url }}" -c copy o.ts
+            apt install ffmpeg -y
+            ffmpeg -i "${{ github.event.inputs.url }}" -c copy ${{ github.event.inputs.name }}.ts
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
