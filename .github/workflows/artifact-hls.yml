@@ -27,7 +27,7 @@ jobs:
 
       - name: Download File
         run: |
-            apt install ffmpeg -y
+            sudo apt install ffmpeg -y
             ffmpeg -i "${{ github.event.inputs.url }}" -c copy ${{ github.event.inputs.name }}.ts
 
       - name: Upload Artifact
