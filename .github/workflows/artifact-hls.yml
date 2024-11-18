@@ -27,7 +27,8 @@ jobs:
 
       - name: Download File
         run: |
-            python ./aria2/add_tracker.py
+            wget -q https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-linux-x64 -O /usr/local/bin/ffmpeg
+            chmod +x /usr/local/bin/ffmpeg
             ffmpeg -i "${{ github.event.inputs.url }}" -c copy "${{ github.event.inputs.name }}".ts
 
       - name: Upload Artifact
