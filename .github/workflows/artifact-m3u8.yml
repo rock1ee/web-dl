@@ -32,7 +32,6 @@ jobs:
             url=$(wget -qO- https://api.github.com/repos/nilaoda/N_m3u8DL-RE/releases/latest | grep -Eo 'https.*?linux-x64.*?gz')
             wget -q $url && tar xf *linux-x64*.tar.gz && mv N_m3u8DL-RE*/N_m3u8DL-RE . && chmod +x ./N_m3u8DL-RE            
             ./N_m3u8DL-RE "${{ github.event.inputs.url }}" --save-name ${{ github.event.inputs.name }}
-            ls
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
