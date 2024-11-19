@@ -29,12 +29,12 @@ jobs:
         run: |
             wget -q https://github.com/llychao/m3u8-downloader/releases/latest/download/m3u8-linux-amd64
             chmod +x ./m3u8-linux-amd64
-            ./m3u8-linux-amd64 -u="${{ github.event.inputs.url }}" -o="${{ github.event.inputs.name }}"
+            ./m3u8-linux-amd64 -ht=v2 -u="${{ github.event.inputs.url }}" -o="${{ github.event.inputs.name }}"
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: "${{ github.event.inputs.name }}"
-          path: "${{ github.event.inputs.name }}"
+          path: "${{ github.event.inputs.name }}.mp4"
           compression-level: 0
 
       - name: Delete workflow runs
