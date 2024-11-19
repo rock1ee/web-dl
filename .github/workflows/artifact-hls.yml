@@ -1,4 +1,4 @@
-name: Upload to Artifact(M3U8)
+name: Upload to Artifact(FFMPEG)
 
 on:
   workflow_dispatch:
