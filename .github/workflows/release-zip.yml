@@ -35,7 +35,7 @@ jobs:
 
       - name: Zip
         run: |
-          zip -0 -s 2000m -rm ${{ github.event.inputs.tag }}-linux-64.zip DowloadDir
+          zip -0 -s 2000m -rm ${{ github.event.inputs.tag }}-linux-x64.zip DowloadDir
 
       - name: Upload
         env:
