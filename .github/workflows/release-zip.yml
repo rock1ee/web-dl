@@ -26,7 +26,7 @@ jobs:
           #remove-haskell: 'true'
 
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download
         run: |
@@ -35,13 +35,13 @@ jobs:
 
       - name: Zip
         run: |
-          zip -0 -s 2000m -rm x86_64-unknown-linux-musl.zip DowloadDir
+          zip -0 -s 2000m -rm ${{ github.event.inputs.tag }}-linux-64.zip DowloadDir
 
       - name: Upload
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ github.event.inputs.tag }} --title v$(date "+%Y%m%d%H%M%S") x86_64-unknown-linux-musl*
+          gh release create ${{ github.event.inputs.tag }} --title v$(date "+%Y%m%d%H%M%S") *-linux-x64.z*
       
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
