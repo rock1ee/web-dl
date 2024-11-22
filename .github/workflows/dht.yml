@@ -50,7 +50,7 @@ jobs:
           git config --local user.name "${ACTOR}"
           git add ./aria2/dht.dat ./aria2/dht6.dat
           git add ./transmission/dht.dat
-          # git add ./qBittorrent/*
+          git add ./qBittorrent/*
           git commit -m 'update'
           git push -f origin main
 
