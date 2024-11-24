@@ -21,26 +21,26 @@ jobs:
           python ./aria2/add_tracker.py
           aria2c --conf-path=./aria2/aria2.conf "${{ github.event.inputs.url }}"
 
-      - name: qBittorrent
-        run: |
-          python ./qBittorrent/dl_qbee.py && chmod +x qbittorrent-nox
-          ./qbittorrent-nox --profile=. -d "${{ github.event.inputs.url }}"
-          python ./qBittorrent/stats.py
-          rm -rf ./qBittorrent/data/BT_backup/*
-          rm -rf ./qBittorrent/data/logs/*
-          rm -rf ./qBittorrent/downloads/*          
+      # - name: qBittorrent
+      #   run: |
+      #     python ./qBittorrent/dl_qbee.py && chmod +x qbittorrent-nox
+      #     ./qbittorrent-nox --profile=. -d "${{ github.event.inputs.url }}"
+      #     python ./qBittorrent/stats.py
+      #     rm -rf ./qBittorrent/data/BT_backup/*
+      #     rm -rf ./qBittorrent/data/logs/*
+      #     rm -rf ./qBittorrent/downloads/*          
 
 
-      - name: Transmission
-        run: |
-          sudo apt install transmission-cli -y
-          echo "net.core.rmem_max = 4194304" | sudo tee -a /etc/sysctl.conf
-          echo "net.core.wmem_max = 1048576" | sudo tee -a /etc/sysctl.conf
-          sudo sysctl -p
-          transmission-cli -g ./transmission -w ./tmp "${{ github.event.inputs.url }}"
-          rm -rf ./transmission/torrents/*
-          rm -rf ./transmission/resume/*
-          rm -rf ./tmp
+      # - name: Transmission
+      #   run: |
+      #     sudo apt install transmission-cli -y
+      #     echo "net.core.rmem_max = 4194304" | sudo tee -a /etc/sysctl.conf
+      #     echo "net.core.wmem_max = 1048576" | sudo tee -a /etc/sysctl.conf
+      #     sudo sysctl -p
+      #     transmission-cli -g ./transmission -w ./tmp "${{ github.event.inputs.url }}"
+      #     rm -rf ./transmission/torrents/*
+      #     rm -rf ./transmission/resume/*
+      #     rm -rf ./tmp
 
       - name: Update DHT
         env:
@@ -49,8 +49,8 @@ jobs:
           git config --local user.email "${ACTOR}@users.noreply.github.com"
           git config --local user.name "${ACTOR}"
           git add ./aria2/dht.dat ./aria2/dht6.dat
-          git add ./transmission/dht.dat
-          git add ./qBittorrent/*
+          # git add ./transmission/dht.dat
+          # git add ./qBittorrent/*
           git commit -m 'update'
           git push -f origin main
 
