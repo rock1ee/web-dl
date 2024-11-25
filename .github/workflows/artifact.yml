@@ -34,6 +34,16 @@ jobs:
           path: DownloadDir
           compression-level: 0
 
+      - name: Update DHT
+        env:
+          ACTOR: ${{ github.actor }}
+        run: |
+          git config --local user.email "${ACTOR}@users.noreply.github.com"
+          git config --local user.name "${ACTOR}"
+          git add ./aria2/dht.dat ./aria2/dht6.dat
+          git commit -m 'update'
+          git push -f origin main
+
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
         with:
