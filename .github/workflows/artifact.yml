@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       url:
-        description: 'URL(HTTP/HTTPS OR Metalink)'
+        description: 'URL(HTTP/HTTPS, FTP, SFTP, BitTorrent and Metalink)'
         required: true
 
 jobs:
