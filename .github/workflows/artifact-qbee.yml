@@ -27,7 +27,7 @@ jobs:
             wget -q https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
             sudo tar -xvzf ./ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
             ngrok config add-authtoken ${{ secrets.NGROK_TOKEN }}
-            ngrok http http://localhost:8080
+            ngrok http http://localhost:8080 > /dev/null 2>&1 &
 
       - name: Download File
         run: |
