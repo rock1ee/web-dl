@@ -45,7 +45,7 @@ def torrents_info(addr):
     completed = convert_size(info['completed'])
     ratio = info['ratio']
     eta = convert_time(info['eta'])
-    print(state, f'{completed}/{size}({progress*100:.1f}%) CN:{leechs} SD:{seeds} DL:{dlspeed} UL:{upspeed} {ratio:.1f} ETA:{eta}',flush=True)
+    print(name, state, f'{completed}/{size}({progress*100:.1f}%) CN:{leechs} SD:{seeds} DL:{dlspeed} UL:{upspeed} {ratio:.1f} ETA:{eta}',flush=True)
     return progress
 
 
