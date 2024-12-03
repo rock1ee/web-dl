@@ -31,8 +31,8 @@ jobs:
 
       - name: Download File
         run: |
-            python ./qBittorrent/dl_qbee.py && chmod +x qbittorrent-nox
-            ./qbittorrent-nox --profile=. -d "${{ github.event.inputs.url }}"
+            sudo apt install qbittorrent-nox -y
+            qbittorrent-nox --profile=. -d "${{ github.event.inputs.url }}"
             python ./qBittorrent/stats.py
 
       - name: Upload Artifact
