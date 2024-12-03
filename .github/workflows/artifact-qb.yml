@@ -1,0 +1,63 @@
+name: Upload to Artifact(qb)
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL(BitTorrent or Magent)'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup ngrok
+        run: |
+            wget -q https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+            sudo tar -xvzf ./ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
+            ngrok config add-authtoken ${{ secrets.NGROK_TOKEN }}
+            ngrok http http://localhost:8080 > /dev/null 2>&1 &
+
+      - name: Download File
+        run: |
+            sudo apt install qbittorrent-nox -y
+            qbittorrent-nox --profile=. -d "${{ github.event.inputs.url }}"
+            python ./qBittorrent/stats.py
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.run_id }}
+          path: ./qBittorrent/downloads
+          compression-level: 0
+
+      - name: Update config
+        env:
+          ACTOR: ${{ github.actor }}
+        run: |
+          git config --local user.email "${ACTOR}@users.noreply.github.com"
+          git config --local user.name "${ACTOR}"
+          git add ./qBittorrent/config ./qBittorrent/data/peers.db ./qBittorrent/data/GeoDB
+          git commit -m 'update'
+          git push -f origin main
+
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 3
+          keep_minimum_runs: 0
+          delete_workflow_pattern: Upload to Artifact
+          delete_run_by_conclusion_pattern: cancelled, failure
