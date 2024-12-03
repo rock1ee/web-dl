@@ -28,7 +28,6 @@ jobs:
       - name: Download File
         run: |
             python ./aria2/add_tracker.py
-            chmod +x ./aria2/kill_aria2c.sh
             aria2c --conf-path=./aria2/aria2.conf ${{ github.event.inputs.opts }} -d DownloadDir "${{ github.event.inputs.url }}"
 
       - name: Upload Artifact
