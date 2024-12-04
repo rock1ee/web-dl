@@ -41,7 +41,6 @@ jobs:
         with:
           name: ${{ github.run_id }}
           path: ./qBittorrent/downloads
-          compression-level: 0
 
       - name: Update config
         env:
