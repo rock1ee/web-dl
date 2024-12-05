@@ -48,7 +48,7 @@ jobs:
         run: |
           git config --local user.email "${ACTOR}@users.noreply.github.com"
           git config --local user.name "${ACTOR}"
-          git add ./qBittorrent/config ./qBittorrent/data/peers.db ./qBittorrent/data/GeoDB
+          git add ./qBittorrent/data/peers.db ./qBittorrent/data/GeoDB
           git commit -m 'update'
           git push -f origin main
 
