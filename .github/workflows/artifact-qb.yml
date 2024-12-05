@@ -50,7 +50,7 @@ jobs:
           git config --local user.name "${ACTOR}"
           git add ./qBittorrent/data/peers.db ./qBittorrent/data/GeoDB
           git clean -df
-          git commit -m 'update' && git push -f origin main
+          git commit -m 'update'
 
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
