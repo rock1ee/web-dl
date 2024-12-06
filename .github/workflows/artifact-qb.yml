@@ -22,6 +22,12 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      - name: Setup qBittorrent
+        run: |
+            sudo add-apt-repository ppa:qbittorrent-team/qbittorrent-stable -y
+            sudo apt update
+            sudo apt install qbittorrent-nox -y
+
       - name: Setup cloudflared
         uses: AnimMouse/setup-cloudflared@v2
         
@@ -30,18 +36,12 @@ jobs:
         with:
           url: http://localhost:8080
 
-      - name: Setup qBittorrent
-        run: |
-            sudo add-apt-repository ppa:qbittorrent-team/qbittorrent-stable -y
-            sudo apt update
-            sudo apt install qbittorrent-nox -y
-
-      - name: Download File
+      - name: Download file
         run: |
             qbittorrent-nox --profile=. -d "${{ github.event.inputs.url }}"
             python ./qBittorrent/stats.py
 
-      - name: Upload Artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.run_id }}
