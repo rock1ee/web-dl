@@ -23,9 +23,6 @@ jobs:
         with:
           root-reserve-mb: 512
           swap-size-mb: 1024
-          #remove-dotnet: 'true'
-          #remove-android: 'true'
-          #remove-haskell: 'true'
 
       - name: Checkout source
         uses: actions/checkout@v3
@@ -40,6 +37,16 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
           gh release create ${{ github.run_id }} --title "${{ github.event.inputs.title }}" ${{ github.event.inputs.path }}
+
+      - name: Update DHT
+        env:
+          ACTOR: ${{ github.actor }}
+        run: |
+          git config --local user.email "${ACTOR}@users.noreply.github.com"
+          git config --local user.name "${ACTOR}"
+          git add ./aria2/dht.dat ./aria2/dht6.dat
+          git commit -m 'update'
+          git push -f origin main          
       
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
