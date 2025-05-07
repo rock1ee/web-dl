@@ -1,0 +1,51 @@
+name: Upload to Artifact(offline)
+
+on:
+  repository_dispatch:
+    types: [magnet_download_trigger]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Download File
+        run: |
+            python ./aria2/add_tracker.py
+            aria2c --conf-path=./aria2/aria2.conf -d DownloadDir "${{ github.event.client_payload.magnet_url }}"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.run_id }}
+          path: DownloadDir
+          compression-level: 0
+
+      - name: Update DHT
+        env:
+          ACTOR: ${{ github.actor }}
+        run: |
+          git config --local user.email "${ACTOR}@users.noreply.github.com"
+          git config --local user.name "${ACTOR}"
+          git add ./aria2/dht.dat ./aria2/dht6.dat
+          git commit -m 'update'
+          git push -f origin main
+
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 3
+          keep_minimum_runs: 0
+          delete_workflow_pattern: Upload to Artifact
+          delete_run_by_conclusion_pattern: cancelled, failure
