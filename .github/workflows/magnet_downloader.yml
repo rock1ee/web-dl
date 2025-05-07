@@ -1,0 +1,76 @@
+name: Magnet Link Downloader
+
+on:
+  repository_dispatch:
+    types: [magnet_download_trigger] # Must match GITHUB_EVENT_TYPE in Tampermonkey script
+
+jobs:
+  download_magnet_content:
+    runs-on: ubuntu-latest
+    permissions: # Not strictly needed for download, but good practice if interacting with repo later
+      contents: read
+    steps:
+      - name: Checkout repository (optional)
+        uses: actions/checkout@v4 # Only if you need files from your repo for the script
+
+      - name: Install aria2
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y aria2
+          echo "aria2 installed: $(aria2c --version | head -n 1)"
+
+      - name: Echo Magnet Link
+        run: echo "Attempting to download: ${{ github.event.client_payload.magnet_url }}"
+
+      - name: Create Download Directory
+        id:   create_dir
+        run:  |
+          TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+          # Sanitize filename_hint if present, otherwise use timestamp
+          FILENAME_HINT_RAW="${{ github.event.client_payload.filename_hint }}"
+          # Replace invalid filename characters, limit length
+          FILENAME_HINT_SANITIZED=$(echo "$FILENAME_HINT_RAW" | sed 's/[^a-zA-Z0-9._-]/_/g' | cut -c 1-100)
+          DOWNLOAD_DIR_NAME="download_${FILENAME_HINT_SANITIZED}_${TIMESTAMP}"
+          # If no good hint, use a simpler name
+          if [ "$FILENAME_HINT_SANITIZED" = "_" ] || [ -z "$FILENAME_HINT_SANITIZED" ]; then
+            DOWNLOAD_DIR_NAME="download_${TIMESTAMP}"
+          fi
+          mkdir -p "${DOWNLOAD_DIR_NAME}"
+          echo "DOWNLOAD_PATH=${DOWNLOAD_DIR_NAME}" >> $GITHUB_ENV
+          echo "Created directory: ${DOWNLOAD_DIR_NAME}"
+
+      - name: Download with aria2
+        run: |
+          echo "Downloading to: ${{ env.DOWNLOAD_PATH }}"
+          aria2c --dir="${{ env.DOWNLOAD_PATH }}" \
+                 --seed-time=0 \
+                 --max-overall-upload-limit=1K \
+                 --bt-stop-timeout=300 \
+                 --max-concurrent-downloads=5 \
+                 --max-connection-per-server=5 \
+                 --split=5 \
+                 --min-split-size=1M \
+                 --summary-interval=10 \
+                 --console-log-level=info \
+                 --follow-torrent=mem \
+                 "${{ github.event.client_payload.magnet_url }}"
+        timeout-minutes: 350 # Max for a job is 6 hours (360 min)
+
+      - name: List Downloaded Files
+        run: |
+          echo "Contents of ${{ env.DOWNLOAD_PATH }}:"
+          ls -Rhlp "${{ env.DOWNLOAD_PATH }}"
+
+      - name: Upload Downloaded Files as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: magnet-download-${{ github.run_id }} # Unique artifact name
+          path: ${{ env.DOWNLOAD_PATH }}/* # Upload contents of the directory
+          if-no-files-found: warn # 'warn', 'error', or 'ignore'
+          retention-days: 7 # Adjust as needed
+
+      - name: Clean up download directory (optional)
+        if: always() # Run even if previous steps fail
+        run: |
+          echo "Cleaning up ${{ env.DOWNLOAD_PATH }}"
+          rm -rf "${{ env.DOWNLOAD_PATH }}"
