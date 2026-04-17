@@ -36,7 +36,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
-          gh release create ${{ github.run_id }} --title "${{ github.event.inputs.title }}" ${{ github.event.inputs.path }}
+          gh release create ${{ github.run_id }} --title "${{ github.event.inputs.title }}" "${{ github.event.inputs.path }}"
 
       - name: Update DHT
         env:
