@@ -24,7 +24,7 @@ jobs:
             aria2c --conf-path=./aria2/aria2.conf -d DownloadDir "${{ github.event.client_payload.magnet_url }}"
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ github.run_id }}
           path: DownloadDir
