@@ -1,0 +1,7 @@
+version: 2
+updates:
+  # 专门针对 GitHub Actions 进行依赖检查
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly" # 可以设置为 "daily", "weekly", 或 "monthly"
