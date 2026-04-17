@@ -23,7 +23,7 @@ jobs:
           swap-size-mb: 1024
 
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup Aria2/Uploader
         run: |

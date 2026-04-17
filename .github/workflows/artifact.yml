@@ -23,7 +23,7 @@ jobs:
           swap-size-mb: 1024
 
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download File
         run: |
