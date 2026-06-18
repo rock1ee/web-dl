@@ -8,11 +8,18 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Setup Cloudflare Tunnel
+        uses: AnimMouse/setup-cloudflared@v2
+        
+      - name: Expose Webtop via Tunnel
+        uses: AnimMouse/setup-cloudflared/tunnel@v2
+        with:
+          url: http://localhost:3000
+    
       - name: Start Webtop (Cloud Browser Container)
         run: |
           echo "Pulling and starting Webtop (Alpine XFCE + Chromium)..."
-          # 使用极轻量的 alpine-chromium 镜像，启动速度极快
-          docker run -d \
+          docker run \
             --name=webtop \
             --security-opt seccomp=unconfined \
             -e PUID=1000 \
@@ -21,14 +28,6 @@ jobs:
             -p 3000:3000 \
             -v /dev/shm:/dev/shm \
             linuxserver/webtop:alpine-chromium
-
-      - name: Setup Cloudflare Tunnel
-        uses: AnimMouse/setup-cloudflared@v2
-        
-      - name: Expose Webtop via Tunnel
-        uses: AnimMouse/setup-cloudflared/tunnel@v2
-        with:
-          url: http://localhost:3000
 
       - name: Keep Alive
         run: |
