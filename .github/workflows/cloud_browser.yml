@@ -8,26 +8,19 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Free up disk space (Optional but good for Docker)
-        run: |
-          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/boost
-
       - name: Start Webtop (Cloud Browser Container)
         run: |
           echo "Pulling and starting Webtop (Alpine XFCE + Chromium)..."
           # 使用极轻量的 alpine-chromium 镜像，启动速度极快
           docker run -d \
             --name=webtop \
-            --security-opt seccomp=unconfined \ # 允许 Chromium 沙盒运行
+            --security-opt seccomp=unconfined \
             -e PUID=1000 \
             -e PGID=1000 \
             -e TZ=Etc/UTC \
             -p 3000:3000 \
-            -v /dev/shm:/dev/shm \ # 防止 Chrome 崩溃的关键参数
+            -v /dev/shm:/dev/shm \
             linuxserver/webtop:alpine-chromium
-          
-          # 等待容器启动完成
-          sleep 10
 
       - name: Setup Cloudflare Tunnel
         uses: AnimMouse/setup-cloudflared@v2
