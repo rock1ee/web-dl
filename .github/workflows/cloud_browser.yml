@@ -20,20 +20,11 @@ jobs:
         run: |
           echo "Pulling and starting Webtop (Alpine XFCE + Chromium)..."
           docker run \
-            --name=webtop \
+            --name=chromium \
             --security-opt seccomp=unconfined \
             -e PUID=1000 \
             -e PGID=1000 \
             -e TZ=Etc/UTC \
             -p 3000:3000 \
             -v /dev/shm:/dev/shm \
-            linuxserver/webtop:alpine-chromium
-
-      - name: Keep Alive
-        run: |
-          echo "======================================================="
-          echo "✅ 云端浏览器已就绪！"
-          echo "🌐 展开上一层的 [Setup cloudflared tunnel] 查看入口 URL"
-          echo "💻 在你的本地浏览器打开该 URL，你将看到一个完整的桌面和 Chrome！"
-          echo "======================================================="
-          sleep 6h
+            linuxserver/chromium:latest
