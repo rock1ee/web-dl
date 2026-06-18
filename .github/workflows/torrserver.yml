@@ -1,0 +1,75 @@
+name: Stream via TorrServer
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL(BitTorrent or Magent) - 可选，也可稍后在网页端贴入'
+        required: false
+
+jobs:
+  stream:
+    runs-on: ubuntu-24.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+
+      # Setup cloudflared (保持你原有的穿透工具)
+      - name: Setup cloudflared
+        uses: AnimMouse/setup-cloudflared@v2
+        
+      - name: Setup cloudflared tunnel
+        uses: AnimMouse/setup-cloudflared/tunnel@v2
+        with:
+          url: http://localhost:8090 # 注意：这里改成了 TorrServer 的 8090 端口
+
+      - name: Download and Run TorrServer
+        run: |
+            # 下载最新版 TorrServer 的 Linux 二进制文件
+            wget https://github.com/YouROK/TorrServer/releases/latest/download/TorrServer-linux-amd64
+            chmod +x TorrServer-linux-amd64
+            
+            # 创建缓存目录
+            mkdir -p ./torr_data
+            
+            # 后台启动 TorrServer，-d 指定数据目录
+            nohup ./TorrServer-linux-amd64 -d ./torr_data -p 8090 > torrserver.log 2>&1 &
+            
+            # 暂停 3 秒等服务完全启动
+            sleep 3
+            
+            # 如果你在触发 Action 时填入了磁力链接，则通过 API 自动添加到 TorrServer
+            if [ -n "${{ github.event.inputs.url }}" ]; then
+              echo "Detected input URL, adding to TorrServer via API..."
+              curl -X POST "http://localhost:8090/torrents" \
+                   -H "Content-Type: application/json" \
+                   -d '{"action": "add", "link": "${{ github.event.inputs.url }}"}'
+            fi
+
+      - name: Keep Alive for Streaming (Hold the Action)
+        run: |
+          echo "======================================================="
+          echo "✅ TorrServer 启动成功！"
+          echo "🌐 请展开上一步骤 [Setup cloudflared tunnel] 查看你的公网访问网址！"
+          echo "⏳ 容器将保持运行 6 小时（GitHub 最大限制）。"
+          echo "⏹️ 观影结束后，请手动点击 Cancel 取消本次 Action 以释放资源。"
+          echo "======================================================="
+          # 挂起进程，维持 6 小时，让你有足够的时间看电影
+          sleep 6h
+
+      - name: Delete workflow runs
+        # 即使 Action 被手动取消，使用 always() 也能让它清理垃圾日志
+        if: always() 
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 3
+          keep_minimum_runs: 0
+          delete_workflow_pattern: Stream via TorrServer
+          delete_run_by_conclusion_pattern: cancelled, failure
