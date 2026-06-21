@@ -25,7 +25,7 @@ jobs:
 
       - name: Setup CloudTorrent
         run: |
-            curl https://git.io/simpletorrentqs | bash
+            sudo bash <(wget -qO- https://git.io/simpletorrentqs)
 
       - name: Run CloudTorrent
         run: |
