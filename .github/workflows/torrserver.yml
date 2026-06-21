@@ -48,7 +48,9 @@ jobs:
                        "sets": {
                          "UseDisk": true,
                          "CacheSize": 16106127360,
+                         "ReaderReadAHead": 95,
                          "PreloadCache": 20,
+                         "RemoveCacheOnDrop": true,
                          "ForceEncrypt": true,
                          "RetrackersMode": 1,
                          "DisableUPNP": true
