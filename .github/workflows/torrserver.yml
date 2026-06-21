@@ -48,7 +48,7 @@ jobs:
                        "sets": {
                          "UseDisk": true,
                          "TorrentsSavePath": "'"$PWD"'/torr_data", 
-                         "CacheSize": 16106127360,
+                         "CacheSize": 21474836480,
                          "ReaderReadAHead": 95,
                          "PreloadCache": 20,
                          "RemoveCacheOnDrop": true,
@@ -70,8 +70,7 @@ jobs:
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
-          retain_days: 3
+          retain_days: 0
           keep_minimum_runs: 0
           delete_workflow_pattern: Stream via TorrServer
-          # 加入了 success，这样你在网页端正常关闭导致的成功运行也会被清理
           delete_run_by_conclusion_pattern: cancelled, failure, success
