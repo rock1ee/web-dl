@@ -30,15 +30,35 @@ jobs:
             chmod +x TorrServer-linux-amd64
             mkdir -p ./torr_data
 
-      - name: Run TorrServer
+      - name: Run TorrServer with Auto-Tuning
         run: |
           echo "======================================================="
           echo "✅ TorrServer 即将启动！"
-          echo "🌐 请展开上方 [Setup cloudflared tunnel] 步骤查看你的公网网址！"
-          echo "⏹️ 观影结束后，请在网页端设置里点击【关闭服务器】，当前 Action 会自动结束。"
+          echo "🌐 请展开上方 [Setup cloudflared tunnel] 步骤查看公网网址！"
+          echo "🛠️ 引擎优化：1GB纯内存缓存 / 强加密 / 自动追加Tracker / 关闭UPNP"
+          echo "⏹️ 观影结束后，请在网页端设置里点击【关闭服务器】结束任务。"
           echo "======================================================="
           
-          # 直接在前台运行，阻塞当前 Step。进程结束才会进入下一步。
+          # 【魔法时刻】利用后台子进程，在服务启动后延时 3 秒，通过 API 自动注入调优参数
+          (
+            sleep 3
+            curl -s -X POST -H "Content-Type: application/json" \
+                 -d '{
+                       "action": "set",
+                       "sets": {
+                         "UseDisk": false,
+                         "CacheSize": 1073741824,
+                         "PreloadCache": 20,
+                         "ForceEncrypt": true,
+                         "RetrackersMode": 1,
+                         "DisableUPNP": true
+                       }
+                     }' \
+                 http://127.0.0.1:8090/settings > /dev/null
+            echo -e "\n[Auto-Config] 🚀 参数调优已通过内部 API 下发并即时生效！"
+          ) &
+
+          # 前台阻塞运行 TorrServer，直到你在网页端点击退出
           ./TorrServer-linux-amd64 -d ./torr_data -p 8090
 
       - name: Delete workflow runs
