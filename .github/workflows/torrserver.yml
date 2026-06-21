@@ -50,7 +50,7 @@ jobs:
                          "TorrentsSavePath": "'"$PWD"'/torr_data", 
                          "CacheSize": 21474836480,
                          "ReaderReadAHead": 95,
-                         "PreloadCache": 20,
+                         "PreloadCache": 5,
                          "RemoveCacheOnDrop": true,
                          "ForceEncrypt": true,
                          "RetrackersMode": 1,
