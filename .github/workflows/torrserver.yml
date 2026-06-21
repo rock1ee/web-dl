@@ -35,7 +35,7 @@ jobs:
           echo "======================================================="
           echo "✅ TorrServer 即将启动！"
           echo "🌐 请展开上方 [Setup cloudflared tunnel] 步骤查看公网网址！"
-          echo "🛠️ 引擎优化：1GB纯内存缓存 / 强加密 / 自动追加Tracker / 关闭UPNP"
+          echo "🛠️ 引擎优化：15GB超大磁盘缓存 / 强加密 / 自动追加Tracker / 关闭UPNP"
           echo "⏹️ 观影结束后，请在网页端设置里点击【关闭服务器】结束任务。"
           echo "======================================================="
           
@@ -46,8 +46,8 @@ jobs:
                  -d '{
                        "action": "set",
                        "sets": {
-                         "UseDisk": false,
-                         "CacheSize": 1073741824,
+                         "UseDisk": true,
+                         "CacheSize": 16106127360,
                          "PreloadCache": 20,
                          "ForceEncrypt": true,
                          "RetrackersMode": 1,
