@@ -52,6 +52,7 @@ jobs:
                          "PreloadCache": 25,
                          "RemoveCacheOnDrop": false,
                          "ConnectionsLimit": 512,
+                         "RetrackersMode":1,
                          "ResponsiveMode": true
                        }
                      }' \
