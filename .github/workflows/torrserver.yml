@@ -47,6 +47,7 @@ jobs:
                        "action": "set",
                        "sets": {
                          "UseDisk": true,
+                         "TorrentsSavePath": "'"$PWD"'/torr_data", 
                          "CacheSize": 16106127360,
                          "ReaderReadAHead": 95,
                          "PreloadCache": 20,
