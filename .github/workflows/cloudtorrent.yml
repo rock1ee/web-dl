@@ -1,0 +1,43 @@
+name: Cloud Torrent
+
+on:
+  workflow_dispatch:
+
+jobs:
+  stream:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+
+      - name: Setup cloudflared
+        uses: AnimMouse/setup-cloudflared@v2
+        
+      - name: Setup cloudflared tunnel
+        uses: AnimMouse/setup-cloudflared/tunnel@v2
+        with:
+          url: http://localhost:3000
+
+      - name: Setup CloudTorrent
+        run: |
+            curl https://i.jpillora.com/cloud-torrent! | bash
+
+      - name: Run CloudTorrent
+        run: |
+          cloud-torrent -p 3000
+
+      - name: Delete workflow runs
+        if: always()
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 0
+          delete_workflow_pattern: Cloud Torrent
+          delete_run_by_conclusion_pattern: cancelled, failure, success
