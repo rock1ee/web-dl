@@ -35,7 +35,6 @@ jobs:
           echo "======================================================="
           echo "✅ TorrServer 即将启动！"
           echo "🌐 请展开上方 [Setup cloudflared tunnel] 步骤查看公网网址！"
-          echo "🛠️ 引擎优化：15GB超大磁盘缓存 / 强加密 / 自动追加Tracker / 关闭UPNP"
           echo "⏹️ 观影结束后，请在网页端设置里点击【关闭服务器】结束任务。"
           echo "======================================================="
           
@@ -48,13 +47,12 @@ jobs:
                        "sets": {
                          "UseDisk": true,
                          "TorrentsSavePath": "'"$PWD"'/torr_data", 
-                         "CacheSize": 21474836480,
+                         "CacheSize": 17179869184,
                          "ReaderReadAHead": 95,
-                         "PreloadCache": 5,
-                         "RemoveCacheOnDrop": true,
-                         "ForceEncrypt": true,
-                         "RetrackersMode": 1,
-                         "DisableUPNP": true
+                         "PreloadCache": 25,
+                         "RemoveCacheOnDrop": false,
+                         "ConnectionsLimit": 512,
+                         "ResponsiveMode": true
                        }
                      }' \
                  http://127.0.0.1:8090/settings > /dev/null
